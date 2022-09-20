@@ -28,6 +28,44 @@
       },
     },
     {
+      "label": "Remove config from local kubectl",
+      "detail": "Add aws eks kubectl config to local local environment",
+      "type": "shell",
+      "command": "scripts/kubectl-remove-config.sh",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+        "close": false
+      },
+      "icon": {
+        "id": "remove",
+        "color": "terminal.ansiBlue"
+      }
+    },
+    {
+      "label": "Update local kubectl config",
+      "detail": "Add aws eks kubectl config to local local environment",
+      "type": "shell",
+      "command": "scripts/kubectl-update-config.sh",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": false,
+        "close": false
+      },
+      "icon": {
+        "id": "edit",
+        "color": "terminal.ansiBlue"
+      }
+    },
+    {
       "label": "Run tests",
       "detail": "Run tests using TerraTest",
       "type": "shell",
