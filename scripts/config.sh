@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source .env 2> /dev/null
-source .scripts.config
+source .repo.config
 
 check_env () {
 
@@ -13,17 +13,17 @@ check_env () {
 }
 
 check_scripts_config() {
-  if [ ! -f ".scripts.config" ];
+  if [ ! -f ".repo.config" ];
   then
-    echo "Error \`.scripts.config\` file is required to configure the scripts' behavior"
+    echo "Error \`.repo.config\` file is required to configure the scripts' behavior"
     exit 20
   fi
 
-  source .scripts.config
+  source .repo.config
 
   if [ -z "$TF_VARS_MAIN_FILE_NAME" ];
   then
-    echo "Error: \`.scripts.config.TF_VARS_MAIN_FILE_NAME\` needs to be set for this script to work"
+    echo "Error: \`.repo.config.TF_VARS_MAIN_FILE_NAME\` needs to be set for this script to work"
     exit 21
   fi
 
@@ -35,17 +35,17 @@ check_scripts_config() {
 }
 
 check_ingress_file_config() {
-  source .scripts.config
+  source .repo.config
 
   if [ -z "$TF_VARS_INGRESS_FILE_NAME" ];
   then
-    echo "Error: `.scripts.config.TF_VARS_INGRESS_FILE_NAME` needs to be set for this script to work"
+    echo "Error: `.repo.config.TF_VARS_INGRESS_FILE_NAME` needs to be set for this script to work"
     exit 30
   fi
 
 }
 
-check_env
-check_scripts_config
+# check_env
+# check_scripts_config
 
 MAIN_VAR_FILE="vars/$TF_VARS_MAIN_FILE_NAME.$ENVIRONMENT.tfvars"
