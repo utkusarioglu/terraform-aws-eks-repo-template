@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source scripts/config.sh
+check_env
 
 if [[ "$(git remote)" != *"$TEMPLATE_REPO_ORIGIN"* ]];
 then

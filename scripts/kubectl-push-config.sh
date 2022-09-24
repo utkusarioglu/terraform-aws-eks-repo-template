@@ -1,6 +1,8 @@
 #!/bin/bash
 
 source scripts/config.sh || exit 1
+check_env
+check_repo_config
 
 cluster_name=$(cat $MAIN_VAR_FILE | hclq get 'cluster_name' --raw)
 cluster_region=$(cat $MAIN_VAR_FILE | hclq get 'cluster_region' --raw)

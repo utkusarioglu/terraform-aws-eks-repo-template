@@ -12,7 +12,7 @@ check_env () {
   fi
 }
 
-check_scripts_config() {
+check_repo_config() {
   if [ ! -f ".repo.config" ];
   then
     echo "Error \`.repo.config\` file is required to configure the scripts' behavior"
@@ -45,7 +45,5 @@ check_ingress_file_config() {
 
 }
 
-# check_env
-# check_scripts_config
 
 MAIN_VAR_FILE="vars/$TF_VARS_MAIN_FILE_NAME.$ENVIRONMENT.tfvars"

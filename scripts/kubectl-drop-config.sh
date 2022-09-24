@@ -1,6 +1,8 @@
 #!/bin/bash
 
 source scripts/config.sh || exit 1
+check_env
+check_repo_config
 
 remove_users() {
   cluster_name=$1

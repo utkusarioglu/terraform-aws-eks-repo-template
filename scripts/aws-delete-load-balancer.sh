@@ -1,6 +1,8 @@
 #!/bin/bash
 
 source scripts/config.sh || exit 1
+check_env
+check_repo_config
 check_ingress_file_config
 
 lb_name=$(cat $MAIN_VAR_FILE | hclq get 'cluster_name' --raw)
