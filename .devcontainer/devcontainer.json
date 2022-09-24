@@ -6,7 +6,7 @@
   ],
   "service": "terraform",
   "workspaceFolder": "/utkusarioglu-com/templates/terraform-eks-repo-template",
-  "postCreateCommand": "scripts/git-status.sh",
+  "postCreateCommand": "scripts/git-update-status.sh",
   "customizations": {
     "vscode": {
       "extensions": [
