@@ -1,8 +1,6 @@
 #!/bin/bash
 
-source .scripts.config
-
-check_tfvars
+source scripts/config.sh || exit 1
 
 remove_users() {
   cluster_name=$1
@@ -52,7 +50,9 @@ remove_contexts() {
   echo
 }
 
-cluster_name=$(jq -r '.cluster_name' $TFVARS_FILE_PATH)
+var_file="vars/$TF_VARS_MAIN_FILE_NAME.$ENVIRONMENT.tfvars"
+cluster_name=$(cat $var_file | hclq get 'cluster_name' --raw)
+
 echo "Starting removal of $cluster_name resources…"
 remove_users $cluster_name
 remove_clusters $cluster_name
