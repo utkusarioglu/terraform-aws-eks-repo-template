@@ -12,8 +12,8 @@ services:
 
 volumes:
   vscode-extensions:
-    name: terraform-aws-eks-repo-template-vscode-extensions
+    name: terraform-eks-repo-template-vscode-extensions
   vscode-extensions-insiders:
-    name: terraform-aws-eks-repo-template-vscode-extensions-insiders
+    name: terraform-eks-repo-template-vscode-extensions-insiders
   go:
-    name: terraform-aws-eks-repo-template-go
+    name: terraform-eks-repo-template-go
