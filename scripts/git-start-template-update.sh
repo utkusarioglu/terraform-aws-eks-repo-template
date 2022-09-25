@@ -1,6 +1,9 @@
 #!/bin/bash
 
-REPO_CONFIG_FILE=".repo.config"
+source scripts/config.sh
+# check_repo_config
+check_template_config
+
 DEFAULT_TEMPLATE_REMOTE_NAME="template"
 DEFAULT_TEMPLATE_REMOTE_BRANCH="main"
 DEFAULT_LOCAL_STAGING_BRANCH="chore/template-update"
@@ -69,7 +72,13 @@ git checkout -b $local_staging_branch
 git fetch template
 
 # Rewrites the last template update
-if [ ! -f .repo.config ];
+record_target=$REPO_CONFIG_FILE
+if [[ "$REPO_TYPE" == "template" ]];
+  then
+    record_target=$TEMPLATE_CONFIG_FILE
+  fi
+if [ ! -f $record_target ];
+
 then
   touch $REPO_CONFIG_FILE
 fi
@@ -90,7 +99,16 @@ echo
 echo -e "${green}Template update started${end_color}"
 cat <<EOF
 
-The repo is now on branch '${local_staging_branch}'. Template changes have been
-applied on top of '${merge_branch}'. You can now reject the changes that you do not want, 
-and then merge them to '${merge_branch}' or any other branch you prefer.
+Current branch:  $local_staging_branch
+Merge branch:    $merge_branch
+Template branch: $template_remote_name/$template_remote_branch
+Template url:    $TEMPLATE_REPO_URL
+Template date:   $template_date_human
+
+You can now reject the changes that you do not want, and then merge/rebase them 
+with '$merge_branch' or any other branch you prefer.
+
+Note that the \`$record_target.TEMPLATE_LAST_COMMIT_EPOCH\` now records the date of 
+the last commit of the template. You should commit this line if you accept any
+of the changes from the template repo.
 EOF

@@ -4,7 +4,6 @@ source .env 2> /dev/null
 source .repo.config
 
 check_env () {
-
   if [ -z "$ENVIRONMENT" ];
   then
     echo "Warn: \`.env.ENVIRONMENT\` hasn't been set. Using '$DEFAULT_ENVIRONMENT_NAME' for this script."
@@ -34,6 +33,32 @@ check_repo_config() {
   fi
 }
 
+check_template_config() {
+  if [[ "$REPO_TYPE" != "template" ]];
+  then
+    break
+  fi
+
+  file_name=".template.config"
+  if [ ! -f "$file_name" ];
+  then
+    echo "Error \`$file_name\` file is required to configure the scripts' behavior"
+    exit 20
+  fi
+
+  source $file_name
+
+  for var in TEMPLATE_REPO_ORIGIN TEMPLATE_REPO_URL TEMPLATE_LAST_COMMIT_EPOCH;
+  do
+    if [ -z "$var" ];
+    then
+      echo "Error: \`$file_name.$var\` needs to be set for this script to work"
+      exit 21
+    fi
+  done
+}
+
+
 check_ingress_file_config() {
   source .repo.config
 
@@ -47,3 +72,5 @@ check_ingress_file_config() {
 
 
 MAIN_VAR_FILE="vars/$TF_VARS_MAIN_FILE_NAME.$ENVIRONMENT.tfvars"
+REPO_CONFIG_FILE=".repo.config"
+TEMPLATE_CONFIG_FILE=".template.config"
