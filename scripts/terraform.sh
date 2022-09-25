@@ -3,6 +3,7 @@
 source scripts/config.sh || exit 1
 check_env
 check_repo_config
+check_tfvars_in_repo_config
 
 mkdir -p {logs,plans,vars}
 

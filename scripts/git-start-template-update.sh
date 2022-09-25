@@ -1,38 +1,42 @@
 #!/bin/bash
 
 source scripts/config.sh
-# check_repo_config
-check_template_config
+check_repo_config
 
-DEFAULT_TEMPLATE_REMOTE_NAME="template"
-DEFAULT_TEMPLATE_REMOTE_BRANCH="main"
-DEFAULT_LOCAL_STAGING_BRANCH="chore/template-update"
 default_merge_branch=$(git branch --show-current)
+update_mode=$1
 
-template_remote_name=${1:-$DEFAULT_TEMPLATE_REMOTE_NAME}
-template_remote_branch=${2:-$DEFAULT_TEMPLATE_REMOTE_BRANCH}
-local_staging_branch=${3:-$DEFAULT_LOCAL_STAGING_BRANCH}
+if [[ "$update_mode" != "repo" ]] && [[ "$update_mode" != "parent" ]];
+then
+  echo "Error: Update mode can only be \`parent\` or \`repo\`"
+  exit 1
+fi
+
+if [[ $update_mode == "parent" ]];
+then
+  check_template_config
+fi
+
+local_staging_branch=${3:-"chore/${update_mode}-template-update"}
 merge_branch=${4:-$default_merge_branch}
-template_ref="$template_remote_name/$template_remote_branch"
-template_date_human=$(git log template/main -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S')
-template_date_epoch=$(date -d "$template_date_human" +%s)
+template_ref="$TEMPLATE_REPO_ORIGIN/$TEMPLATE_REPO_BRANCH"
 
-if [ "$1" == "--help" ] || [ "$1" == "-h" ];
+if [ "$@" == "--help" ] || [ "$@" == "-h" ];
 then
   cat << EOF
 Git template update
 template-update.sh [...params]
 
 Params in order (all optional):
-  <template_remote_name>    Remote repository that hosts the template.
-                            Default: $DEFAULT_TEMPLATE_REMOTE_NAME
-  <template_remote_branch>  Remote branch that shall be used as the template
-                            Default: $DEFAULT_TEMPLATE_REMOTE_BRANCH
+  <update_mode>             Required. Sets whether the update is being done
+                            from the repo's template or from a parent template.
+                            Unless you are updating the template itself, you 
+                            want to choose \`repo\`.
   <local_staging_branch>    Local branch to be created for the template update
-                            Default: $DEFAULT_LOCAL_STAGING_BRANCH
+                            Default: \`chore/<update_mode>-template-update\`
   <merge_branch>            The branch on which the changes shall be staged. 
                             Default: the current branch from which the script 
-                            is called, currently: $default_merge_branch
+                            is called, currently: \`$default_merge_branch\`
 
 This script uses '$template_ref' to create a new local branch named
 '$local_staging_branch'. Script will terminate when it merges
@@ -40,12 +44,6 @@ all template changes on top of local branch '$merge_branch'.
 
 EOF
   exit 0
-fi
-
-if [[ "$(git remote)" != *"$template_remote_name"* ]];
-then
-  echo "Error: Remote '$template_remote_name' not found among remotes."
-  exit 1
 fi
 
 if [[ $(git branch) == *"$local_staging_branch"* ]];
@@ -66,23 +64,32 @@ EOF
   exit 3
 fi
 
-echo "Template changes will be merged onto the branch '$merge_branch'"
+source scripts/git-facades.sh
+git_remote_add $TEMPLATE_REPO_ORIGIN $TEMPLATE_REPO_URL
+
+if [[ "$(git remote)" != *"$TEMPLATE_REPO_ORIGIN"* ]];
+then
+  echo "Error: Remote '$TEMPLATE_REPO_ORIGIN' not found among remotes."
+  exit 1
+fi
 
 git checkout -b $local_staging_branch
-git fetch template
+git fetch $TEMPLATE_REPO_ORIGIN
+template_date_human=$(git log $template_ref -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S')
+template_date_epoch=$(date -d "$template_date_human" +%s)
 
 # Rewrites the last template update
 record_target=$REPO_CONFIG_FILE
-if [[ "$REPO_TYPE" == "template" ]];
+if [[ "$update_mode" == "template" ]];
   then
     record_target=$TEMPLATE_CONFIG_FILE
   fi
 if [ ! -f $record_target ];
-
 then
   touch $REPO_CONFIG_FILE
+else
+  sed -i '/TEMPLATE_LAST_COMMIT_EPOCH/d' $REPO_CONFIG_FILE 
 fi
-sed -i '/TEMPLATE_LAST_COMMIT_EPOCH/d' $REPO_CONFIG_FILE 
 echo "TEMPLATE_LAST_COMMIT_EPOCH=$template_date_epoch # $template_date_human" >> $REPO_CONFIG_FILE
 # --
 
@@ -92,16 +99,15 @@ git merge \
   --strategy-option theirs \
   $template_ref
 git reset --mixed $merge_branch
+git remote remove $TEMPLATE_REPO_ORIGIN 1> /dev/null
 
-green="\e[32m"
-end_color="\e[0m"
 echo
-echo -e "${green}Template update started${end_color}"
+echo -e "${green_text}Template update started${end_color}"
 cat <<EOF
 
 Current branch:  $local_staging_branch
 Merge branch:    $merge_branch
-Template branch: $template_remote_name/$template_remote_branch
+Template branch: $TEMPLATE_REPO_ORIGIN/$TEMPLATE_REPO_BRANCH
 Template url:    $TEMPLATE_REPO_URL
 Template date:   $template_date_human
 

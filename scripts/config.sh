@@ -20,6 +20,9 @@ check_repo_config() {
 
   source .repo.config
 
+}
+
+check_tfvars_in_repo_config() {
   if [ -z "$TF_VARS_MAIN_FILE_NAME" ];
   then
     echo "Error: \`.repo.config.TF_VARS_MAIN_FILE_NAME\` needs to be set for this script to work"
@@ -34,11 +37,6 @@ check_repo_config() {
 }
 
 check_template_config() {
-  if [[ "$REPO_TYPE" != "template" ]];
-  then
-    break
-  fi
-
   file_name=".template.config"
   if [ ! -f "$file_name" ];
   then
@@ -74,3 +72,5 @@ check_ingress_file_config() {
 MAIN_VAR_FILE="vars/$TF_VARS_MAIN_FILE_NAME.$ENVIRONMENT.tfvars"
 REPO_CONFIG_FILE=".repo.config"
 TEMPLATE_CONFIG_FILE=".template.config"
+green_text="\e[32m"
+end_color="\e[0m"
