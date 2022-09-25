@@ -10,8 +10,9 @@ template_remote_name=${1:-$DEFAULT_TEMPLATE_REMOTE_NAME}
 template_remote_branch=${2:-$DEFAULT_TEMPLATE_REMOTE_BRANCH}
 local_staging_branch=${3:-$DEFAULT_LOCAL_STAGING_BRANCH}
 merge_branch=${4:-$default_merge_branch}
-
 template_ref="$template_remote_name/$template_remote_branch"
+template_date_human=$(git log template/main -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S')
+template_date_epoch=$(date -d "$template_date_human" +%s)
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ];
 then
@@ -72,9 +73,8 @@ if [ ! -f .repo.config ];
 then
   touch $REPO_CONFIG_FILE
 fi
-sed -i '/TEMPLATE_LAST_UPDATE/d' $REPO_CONFIG_FILE 
-current_epoch=$(date +%s)
-echo "TEMPLATE_LAST_UPDATE=$current_epoch" >> $REPO_CONFIG_FILE
+sed -i '/TEMPLATE_LAST_COMMIT_EPOCH/d' $REPO_CONFIG_FILE 
+echo "TEMPLATE_LAST_COMMIT_EPOCH=$template_date_epoch # $template_date_human" >> $REPO_CONFIG_FILE
 # --
 
 git merge \
@@ -83,3 +83,14 @@ git merge \
   --strategy-option theirs \
   $template_ref
 git reset --mixed $merge_branch
+
+green="\e[32m"
+end_color="\e[0m"
+echo
+echo -e "${green}Template update started${end_color}"
+cat <<EOF
+
+The repo is now on branch '${local_staging_branch}'. Template changes have been
+applied on top of '${merge_branch}'. You can now reject the changes that you do not want, 
+and then merge them to '${merge_branch}' or any other branch you prefer.
+EOF
