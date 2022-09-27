@@ -142,7 +142,10 @@
       "label": "terraform init",
       "detail": "Initialize Terraform providers",
       "type": "shell",
-      "command": "terraform init",
+      "command": "terraform",
+      "args": [
+        "init"
+      ],
       "presentation": {
         "echo": true,
         "reveal": "always",

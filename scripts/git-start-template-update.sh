@@ -2,6 +2,7 @@
 
 source scripts/config.sh
 check_repo_config
+check_repo_template_config
 
 default_merge_branch=$(git branch --show-current)
 update_mode=$1
@@ -14,7 +15,7 @@ fi
 
 if [[ $update_mode == "parent" ]];
 then
-  check_template_config
+  check_parent_template_config
 fi
 
 local_staging_branch=${3:-"chore/${update_mode}-template-update"}
@@ -49,8 +50,8 @@ fi
 if [[ $(git branch) == *"$local_staging_branch"* ]];
 then
   cat << EOF
-Error: There is already a branch named '$local_staging_branch'. Either provide 
-a different local branch name or delete the existing branch.
+Error: There is already a branch named '$local_staging_branch'. 
+Either provide a different local branch name or delete the existing branch.
 EOF
   exit 2
 fi
@@ -64,6 +65,16 @@ EOF
   exit 3
 fi
 
+local_repo_url=$(git remote get-url origin)
+if [[ "$local_repo_url" == "$TEMPLATE_REPO_URL" ]]
+then
+  cat <<EOF
+Error: Local repo url is the same as the remote template url. This can mean
+that there is a configuration error with the url of '$update_mode'.
+EOF
+  exit 4
+fi
+
 source scripts/git-facades.sh
 git_remote_add $TEMPLATE_REPO_ORIGIN $TEMPLATE_REPO_URL
 
@@ -73,36 +84,42 @@ then
   exit 1
 fi
 
+record_target=$REPO_CONFIG_FILE
+if [[ "$update_mode" == "parent" ]];
+then
+  record_target=$PARENT_TEMPLATE_CONFIG_FILE
+fi
+
 git checkout -b $local_staging_branch
 git fetch $TEMPLATE_REPO_ORIGIN
-template_date_human=$(git log $template_ref -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S')
+template_date_human=$(git_last_commit_utc_date $template_ref)
 template_date_epoch=$(date -d "$template_date_human" +%s)
 
-# Rewrites the last template update
-record_target=$REPO_CONFIG_FILE
-if [[ "$update_mode" == "template" ]];
-  then
-    record_target=$TEMPLATE_CONFIG_FILE
-  fi
-if [ ! -f $record_target ];
-then
-  touch $REPO_CONFIG_FILE
-else
-  sed -i '/TEMPLATE_LAST_COMMIT_EPOCH/d' $REPO_CONFIG_FILE 
-fi
-echo "TEMPLATE_LAST_COMMIT_EPOCH=$template_date_epoch # $template_date_human" >> $REPO_CONFIG_FILE
-# --
-
-git merge \
+merge_response=$(git merge \
   --squash \
   --allow-unrelated-histories \
   --strategy-option theirs \
-  $template_ref
-git reset --mixed $merge_branch
+  $template_ref 2>&1)
 git remote remove $TEMPLATE_REPO_ORIGIN 1> /dev/null
 
+if [[ "$merge_response" == *"error"* ]];
+then
+  git checkout $merge_branch
+  git branch -D $local_staging_branch
+  echo
+  echo "Error: There was a git error during the merging process:"
+  echo
+  echo "$merge_response"
+  echo
+  echo "Changes have been reverted. Please restart the process once the error is resolved."
+  exit 5
+fi
+
+git reset --mixed $merge_branch
+git_template_update_record "$record_target" "$template_date_human" "$template_date_epoch"
+
 echo
-echo -e "${green_text}Template update started${end_color}"
+echo -e "${GREEN_TEXT}Template update started${DEFAULT_TEXT}"
 cat <<EOF
 
 Current branch:  $local_staging_branch
@@ -114,7 +131,7 @@ Template date:   $template_date_human
 You can now reject the changes that you do not want, and then merge/rebase them 
 with '$merge_branch' or any other branch you prefer.
 
-Note that the \`$record_target.TEMPLATE_LAST_COMMIT_EPOCH\` now records the date of 
-the last commit of the template. You should commit this line if you accept any
-of the changes from the template repo.
+Note that the \`TEMPLATE_LAST_COMMIT_EPOCH\` in \`$record_target\`  now records the 
+date of the last commit of the template. You should commit this line if you 
+accept any of the changes from the template repo.
 EOF
