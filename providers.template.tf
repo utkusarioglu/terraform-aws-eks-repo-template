@@ -3,7 +3,7 @@ provider "aws" {
   profile = var.aws_profile
 
   default_tags {
-    tags = var.aws_default_tags
+    tags = var.aws_provider_default_tags
   }
 }
 
