@@ -3,6 +3,7 @@ cluster_name              = "example-cluster"
 project_name              = "example-project"
 aws_profile               = "example-profile"
 cluster_version           = "0.0"
+cluster_region            = "eu-east-9"
 aws_provider_default_tags = {
   ExampleTag = "ExampleValue"
 }
