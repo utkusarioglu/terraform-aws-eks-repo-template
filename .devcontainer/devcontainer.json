@@ -5,7 +5,7 @@
     "docker-compose.yml"
   ],
   "postCreateCommand": "scripts/post-create-command.sh",
-  "service": "terraform",
+  "service": "terraform-eks-repo-template",
   "workspaceFolder": "/utkusarioglu-com/templates/terraform-eks-repo-template",
   "customizations": {
     "vscode": {
