@@ -1,5 +1,8 @@
-project_root_rel_path = "."
-cluster_name          = "example-cluster"
-project_name          = "example-project"
-aws_profile           = "example-profile"
-cluster_version       = "0.0"
+project_root_rel_path     = "."
+cluster_name              = "example-cluster"
+project_name              = "example-project"
+aws_profile               = "example-profile"
+cluster_version           = "0.0"
+aws_provider_default_tags = {
+  ExampleTag = "ExampleValue"
+}

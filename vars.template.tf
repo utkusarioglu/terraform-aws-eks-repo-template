@@ -29,3 +29,8 @@ variable "cluster_version" {
   type        = string
   description = "Version of the EKS cluster"
 }
+
+variable "aws_provider_default_tags" {
+  type        = map(string)
+  description = "Default tags for every AWS resource to be created"
+}

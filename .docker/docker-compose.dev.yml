@@ -3,7 +3,7 @@ version: "3.9"
 services:
   terraform-eks-repo-template:
     container_name: terraform-eks-repo-template
-    image: utkusarioglu/terraform-eks-devcontainer:1.2.14
+    image: utkusarioglu/terraform-aws-eks-devcontainer:1.2.14
     volumes:
       - ..:/utkusarioglu-com/templates/terraform-eks-repo-template
     environment:
