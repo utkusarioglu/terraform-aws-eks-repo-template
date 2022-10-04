@@ -40,9 +40,9 @@ variable "aws_provider_default_tags" {
   description = "Default tags for every AWS resource to be created"
 }
 
-variable "mld" {
+variable "sld" {
   type        = string
-  description = "Mid-level domain"
+  description = "Second-level domain"
 }
 
 variable "tld" {
