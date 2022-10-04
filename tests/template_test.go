@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -11,6 +12,7 @@ import (
 
 func TestTemplate(t *testing.T) {
 	t.Parallel()
+	environment.RequireEnvVar(t, "ENVIRONMENT")
 	repoPath := ".."
 	varFiles := retrieveVarFiles(t)
 	timestamp := createTimestamp()

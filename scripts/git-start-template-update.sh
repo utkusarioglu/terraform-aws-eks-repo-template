@@ -4,6 +4,10 @@ source scripts/config.sh
 check_repo_config
 check_repo_template_config
 
+repo_class=$(cat .devcontainer/devcontainer.json | jq -r '.name')
+repo_service=$(cat .devcontainer/devcontainer.json | jq -r '.service')
+repo_path=$(pwd)
+
 default_merge_branch=$(git branch --show-current)
 update_mode=$1
 
@@ -18,6 +22,7 @@ then
   check_parent_template_config
 fi
 
+template_auto_reject=$TEMPLATE_AUTO_REJECT
 local_staging_branch=${3:-"chore/${update_mode}-template-update"}
 merge_branch=${4:-$default_merge_branch}
 template_ref="$TEMPLATE_REPO_ORIGIN/$TEMPLATE_REPO_BRANCH"
@@ -75,7 +80,7 @@ EOF
   exit 4
 fi
 
-source scripts/git-facades.sh
+source scripts/git-utils.sh
 git_remote_add $TEMPLATE_REPO_ORIGIN $TEMPLATE_REPO_URL
 
 if [[ "$(git remote)" != *"$TEMPLATE_REPO_ORIGIN"* ]];
@@ -116,7 +121,19 @@ then
 fi
 
 git reset --mixed $merge_branch
-git_template_update_record "$record_target" "$template_date_human" "$template_date_epoch"
+git_template_update_record \
+  "$record_target" \
+  "$template_date_human" \
+  "$template_date_epoch"
+
+echo "Applying standard update adjustments…"
+scripts/git-template-update-adjustments.sh \
+  $template_repo_url \
+  $repo_class \
+  $repo_service \
+  $repo_path \
+  $record_target \
+  "$template_auto_reject"
 
 echo
 echo -e "${GREEN_TEXT}Template update started${DEFAULT_TEXT}"

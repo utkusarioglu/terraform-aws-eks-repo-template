@@ -3,4 +3,6 @@
 mkdir -p logs
 
 echo "Starting Terratest…"
-cd tests && go test -timeout 90m && cd ..
+cd tests 
+env $(cat ../.env | xargs) go test -timeout 90m 
+cd ..

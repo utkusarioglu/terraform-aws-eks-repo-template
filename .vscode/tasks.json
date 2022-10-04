@@ -97,7 +97,8 @@
       "type": "shell",
       "command": "scripts/terraform.sh",
       "args": [
-        "destroy"
+        "destroy",
+        "${input:tfApplyDestroyExtraArgs}"
       ],
       "presentation": {
         "echo": true,
@@ -123,6 +124,7 @@
       "command": "scripts/terraform.sh",
       "args": [
         "apply",
+        "${input:tfApplyDestroyExtraArgs}"
       ],
       "presentation": {
         "echo": true,
@@ -191,14 +193,15 @@
   ],
   "inputs": [
     {
-      "id": "modName",
-      "description": "Go module name for the tests folder",
-      "type": "promptString"
-    },
-    {
       "id": "resources",
       "description": "Input Kubernetes resources you would like to watch",
       "default": "po svc ing",
+      "type": "promptString"
+    },
+    {
+      "id": "tfApplyDestroyExtraArgs",
+      "description": "Extra args to add for Terraform apply and destroy",
+      "default": "--auto-approve",
       "type": "promptString"
     }
   ]
