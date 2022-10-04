@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  terraform-eks-repo-template:
+  tf-eks-repo-template:
     volumes:
       - vscode-extensions:/root/.vscode-server/extensions
       - vscode-extensions-insiders:/root/.vscode-server-insiders/extensions
@@ -12,8 +12,8 @@ services:
 
 volumes:
   vscode-extensions:
-    name: terraform-eks-repo-template-vscode-extensions
+    name: tf-eks-repo-template-vscode-extensions
   vscode-extensions-insiders:
-    name: terraform-eks-repo-template-vscode-extensions-insiders
+    name: tf-eks-repo-template-vscode-extensions-insiders
   go:
-    name: terraform-eks-repo-template-go
+    name: tf-eks-repo-template-go

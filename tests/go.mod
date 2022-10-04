@@ -1,4 +1,4 @@
-module utkusarioglu.com/templates/terraform-eks-repo-template
+module utkusarioglu.com/templates/tf-eks-repo-template
 
 go 1.18
 

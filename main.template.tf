@@ -3,5 +3,5 @@ terraform {
 }
 
 output "greeting" {
-  value = "Hello, terraform-eks-repo-template!"
+  value = "Hello, tf-eks-repo-template!"
 }
